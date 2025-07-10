@@ -1,0 +1,321 @@
+@startuml Diagrama de clases
+
+skinparam packageStyle rectangle
+
+package "Domain" #Cyan 
+{
+
+    abstract Entity {
+        -ID : int
+        +getId() : int
+    }
+
+    enum EstadoCompra {
+        PENDIENTE
+        APROBADA
+        COMPLETADA
+        CANCELADA
+    }
+
+    package "Entidades" as Clases #LightCyan {
+        class Cliente {
+            +Nombre : String
+            +Apellido : String
+            +getNombreCompleto() : String
+        }
+
+        class Empleado {
+            +Nombre : String
+            +Apellido : String
+            +Edad : int
+            +Cargo : String
+            +getNombreCompleto() : String
+        }
+
+        class Rol {
+            +Rol : String
+        }
+
+        class Usuario {
+            +NombreUsuario : String
+            +Contraseña : String
+            +Empleado : Empleado
+            +Rol : Rol
+        }
+
+        class Categoria {
+            +Nombre : String
+        }
+
+        class Producto {
+            +Nombre : String
+            +Precio : int
+            +Stock : int
+            +Venta : bool
+            +Codigo : String
+        }
+
+        class Provedoor {
+            +Nombre : String
+            +Direccion : String
+            +Telefono : String
+            +Productos : List<Producto>
+        }
+
+        class Venta {
+            +Codigo : String
+            +Cliente : Cliente
+            +Productos : List<Producto>
+            +Fecha : Date
+            +Total : int
+            +Vendedor : Empleado
+        }
+
+        class Compra {
+            +Codigo : String
+            +Empleado : Empleado
+            +Provedoor : Provedoor
+            +Productos : Map<Producto, int>
+            +Fecha : Date
+            +Total : int
+            +Estado : EstadoCompra
+        }
+    }
+
+    Clases ..|> Entity : Todos implementan
+    Usuario --> Empleado : Tiene
+    Usuario --> Rol : Tiene
+    Provedoor --> Producto : Ofrece
+    Producto --> Categoria : Pertenece
+    Venta --> Cliente : Para
+    Venta --> Producto : Contiene
+    Venta --> Empleado : Vendido por
+    Empleado --> Rol : Tiene
+    Compra --> Empleado : Realizada por
+    Compra --> Provedoor : Realizada a
+    Compra --> Producto : Contiene
+    Compra --> EstadoCompra : Tiene estado
+
+}
+
+package "Infrastructure" as Infra #LightGreen {
+
+    interface IRepositorioGenerico<T> {
+        +guardar(obj : T) : void
+        +actualizar(obj : T) : void
+        +eliminar(id : int) : void
+        +obtenerPorId(id : int) : T
+        +obtenerTodos() : List<T>
+    }
+
+    interface IClienteRepository {
+        +obtenerPorNombre(nombre : String) : List<Cliente>
+        +obtenerPorApellido(apellido : String) : List<Cliente>
+    }
+
+    interface IProductoRepository {
+        +buscarProductosPorNombre(nombre : String) : List<Producto>
+        +buscarPorCategoria(cat : Categoria) : List<Producto>
+        +obtenerPorCodigo(codigo : String) : Producto
+        +obtenerPorProveedor(proveedor : Provedoor) : List<Producto>
+        +actualizarStock(id : int, cantidad : int) : void
+    }
+
+    interface IVentaRepository {
+        +obtenerPorCliente(cliente : Cliente) : List<Venta>
+        +obtenerPorEmpleado(empleado : Empleado) : List<Venta>
+    }
+
+    interface ICompraRepository {
+        +obtenerPorProveedor(proveedor : Provedoor) : List<Compra>
+        +obtenerPorEmpleado(empleado : Empleado) : List<Compra>
+        +obtenerPorEstado(estado : EstadoCompra) : List<Compra>
+    }
+
+    interface IUsuarioRepository {
+        +obtenerPorNombreUsuario(nombreUsuario : String) : Usuario
+        +obtenerPorEmpleado(empleado : Empleado) : Usuario
+    }
+
+    interface IEmpleadoRepository {
+        +obtenerPorCargo(cargo : String) : List<Empleado>
+        +obtenerPorNombre(nombre : String) : List<Empleado>
+    }
+
+    class ClienteRepository {
+        -CadenaConexion : String
+        +guardar(cliente : Cliente) : void
+        +actualizar(cliente : Cliente) : void
+        +eliminar(id : int) : void
+        +obtenerPorId(id : int) : Cliente
+        +obtenerTodos() : List<Cliente>
+        +obtenerPorNombre(nombre : String) : List<Cliente>
+        +obtenerPorApellido(apellido : String) : List<Cliente>
+    }
+
+    class ProductoRepository {
+        -CadenaConexion : String
+        +guardar(producto : Producto) : void
+        +actualizar(producto : Producto) : void
+        +eliminar(id : int) : void
+        +obtenerPorId(id : int) : Producto
+        +obtenerTodos() : List<Producto>
+        +buscarPorCategoria(cat : Categoria) : List<Producto>
+        +actualizarStock(id : int, cantidad : int) : void
+    }
+
+    class VentaRepository {
+        -CadenaConexion : String
+        +guardar(venta : Venta) : void
+        +actualizar(venta : Venta) : void
+        +eliminar(id : int) : void
+        +obtenerPorId(id : int) : Venta
+        +obtenerTodos() : List<Venta>
+        +obtenerPorEmpleado(empleado : Empleado) : List<Venta>
+        +obtenerPorCliente(cliente : Cliente) : List<Venta>
+    }
+
+    class CompraRepository {
+        -CadenaConexion : String
+        +guardar(compra : Compra) : void
+        +actualizar(compra : Compra) : void
+        +eliminar(id : int) : void
+        +obtenerPorId(id : int) : Compra
+        +obtenerTodos() : List<Compra>
+        +obtenerPorProveedor(proveedor : Provedoor) : List<Compra>
+        +obtenerPorEmpleado(empleado : Empleado) : List<Compra>
+        +obtenerPorEstado(estado : EstadoCompra) : List<Compra>
+    }
+
+    class UsuarioRepository {
+        -CadenaConexion : String
+        +guardar(usuario : Usuario) : void
+        +actualizar(usuario : Usuario) : void
+        +eliminar(id : int) : void
+        +obtenerPorId(id : int) : Usuario
+        +obtenerTodos() : List<Usuario>
+        +autenticar(nombreUsuario : String, contraseña : String) : Usuario
+        +obtenerPorEmpleado(empleado : Empleado) : Usuario
+        +obtenerPorNombreUsuario(nombreUsuario : String) : Usuario
+    }
+
+    class EmpleadoRepository {
+        -CadenaConexion : String
+        +guardar(empleado : Empleado) : void
+        +actualizar(empleado : Empleado) : void
+        +eliminar(id : int) : void
+        +obtenerPorId(id : int) : Empleado
+        +obtenerTodos() : List<Empleado>
+        +obtenerPorCargo(cargo : String) : List<Empleado>
+        +obtenerPorNombre(nombre : String) : List<Empleado>
+    }
+
+    ClienteRepository ..|> IClienteRepository : Implementa
+    ProductoRepository ..|> IProductoRepository : Implementa
+    VentaRepository ..|> IVentaRepository : Implementa
+    CompraRepository ..|> ICompraRepository : Implementa
+    UsuarioRepository ..|> IUsuarioRepository : Implementa
+    EmpleadoRepository ..|> IEmpleadoRepository : Implementa
+    IRepositorioGenerico <|.. ClienteRepository : Implementa
+    IRepositorioGenerico <|.. ProductoRepository : Implementa
+    IRepositorioGenerico <|.. VentaRepository : Implementa
+    IRepositorioGenerico <|.. CompraRepository : Implementa
+    IRepositorioGenerico <|.. UsuarioRepository : Implementa
+    IRepositorioGenerico <|.. EmpleadoRepository : Implementa
+}
+
+
+
+package "Services" #LightYellow {
+
+    class ServicioVenta {
+        -ventaRepo : IVentaRepository
+        +registrarVenta(venta : Venta) : void
+        +actualizarVenta(venta : Venta) : void
+        +eliminarVenta(id : int) : void
+        +obtenerVentaPorId(id : int) : Venta
+        +obtenerVentas() : List<Venta>
+        +obtenerVentasPorCliente(cliente : Cliente) : List<Venta>
+        +obtenerVentasPorEmpleado(empleado : Empleado) : List<Venta>
+    }
+
+    class ServicioCompra {
+        -compraRepo : ICompraRepository
+        +guardarCompra(compra : Compra) : void
+        +actualizarCompra(compra : Compra) : void
+        +eliminarCompra(id : int) : void
+        +obtenerCompraPorId(id : int) : Compra
+        +obtenerCompras() : List<Compra>
+        +obtenerComprasPorProveedor(proveedor : Provedoor) : List<Compra>
+        +obtenerComprasPorEmpleado(empleado : Empleado) : List<Compra
+        +obtenerComprasPorEstado(estado : EstadoCompra) : List<Compra>
+    }
+
+    class ServicioInventario {
+        -productoRepo : IProductoRepository
+        +registrarProducto(producto : Producto) : void
+        +actualizarProducto(producto : Producto) : void
+        +eliminarProducto(id : int) : void
+        +obtenerProductoPorId(id : int) : Producto
+        +obtenerProductos() : List<Producto>
+        +buscarProductosPorNombre(nombre : String) : List<Producto>
+        +buscarProductosPorCategoria(categoria : Categoria) : List<Producto>
+        +buscarProductosPorProveedor(proveedor : Provedoor) : List<Producto>
+        +buscarProductoPorCodigo(codigo : String) : Producto
+        +actualizarStock(producto : Producto, cantidad : int) : void
+    }
+
+    class ServicioCliente {
+        -clienteRepo : IClienteRepository
+        +registrarCliente(cliente : Cliente) : void
+        +actualizarCliente(cliente : Cliente) : void
+        +eliminarCliente(id : int) : void
+        +obtenerClientePorId(id : int) : Cliente
+        +obtenerClientes() : List<Cliente>
+        +buscarClientesPorNombre(nombre : String) : List<Cliente>
+        +buscarClientesPorApellido(apellido : String) : List<Cliente>
+    }
+
+    class ServicioUsuario {
+        -usuarioRepo : IUsuarioRepository
+        +registrarUsuario(usuario : Usuario) : void
+        +actualizarUsuario(usuario : Usuario) : void
+        +eliminarUsuario(id : int) : void
+        +obtenerUsuarioPorId(id : int) : Usuario
+        +obtenerUsuarios() : List<Usuario>
+        +autenticarUsuario(nombreUsuario : String, contraseña : String) : Usuario
+        +cambiarContraseña(usuario : Usuario, nuevaContraseña : String) : void
+        +obtenerUsuarioPorEmpleado(empleado : Empleado) : Usuario
+        +obtenerUsuarioPorNombre(nombreUsuario : String) : Usuario
+    }
+
+    class ServicioEmpleado {
+        -empleadoRepo : IEmpleadoRepository
+        +registrarEmpleado(empleado : Empleado) : void
+        +actualizarEmpleado(empleado : Empleado) : void
+        +eliminarEmpleado(id : int) : void
+        +obtenerEmpleadoPorId(id : int) : Empleado
+        +obtenerEmpleados() : List<Empleado>
+        +obtenerEmpleadosPorNombre(nombre : String) : List<Empleado>
+        +obtenerEmpleadosPorCargo(cargo : String) : List<Empleado>
+    }
+
+
+        ServicioVenta -up-> IVentaRepository : usa 
+        ServicioCompra -up-> ICompraRepository : usa 
+        ServicioInventario -up-> IProductoRepository : usa 
+        ServicioCliente -up-> IClienteRepository : usa 
+        ServicioUsuario -up-> IUsuarioRepository : usa 
+        ServicioEmpleado -up-> IEmpleadoRepository : usa
+
+}
+
+Infra -up-> Clases : Utiliza las clases del dominio
+
+
+
+
+@enduml
+
+
+
