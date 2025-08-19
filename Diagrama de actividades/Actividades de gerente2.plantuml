@@ -1,0 +1,37 @@
+@startuml CrearUsuario
+
+|Usuario (Gerente)|
+start
+:Solicita crear nuevo usuario;
+:Ingresa datos del empleado (nombre, apellido, cargo);
+:Selecciona rol (Ventas / Compras / Contabilidad);
+-> ServicioUsuario;
+
+|ServicioUsuario|
+:Validar datos ingresados;
+if (¿Datos válidos?) then (Sí)
+  :Crear objeto Empleado;
+  :Asignar Rol seleccionado;
+  :Crear objeto Usuario asociado al Empleado;
+  :Invocar usuarioRepo.guardar(usuario);
+  -> UsuarioRepository;
+else (No)
+  :Notificar error al Gerente;
+  stop
+endif
+
+|UsuarioRepository|
+:Conectar a la base de datos;
+:Insertar nuevo registro de usuario;
+:Confirmar inserción;
+-> ServicioUsuario;
+
+|ServicioUsuario|
+:Notificar éxito de creación;
+-> Usuario (Gerente);
+
+|Usuario (Gerente)|
+:Recibe confirmación del nuevo usuario creado;
+stop
+
+@enduml
