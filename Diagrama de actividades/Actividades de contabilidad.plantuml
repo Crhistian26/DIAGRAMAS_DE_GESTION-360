@@ -1,0 +1,48 @@
+@startuml AprobarCompra
+
+|Usuario (Contador)|
+start
+:Selecciona una compra pendiente;
+-> ServicioCompra;
+
+|ServicioCompra|
+:Obtener compra por ID;
+-> CompraRepository;
+
+|CompraRepository|
+:Conectar a la base de datos;
+:Recuperar datos de la compra;
+:Devolver Compra;
+-> ServicioCompra;
+
+|ServicioCompra|
+:Mostrar datos al Contador;
+-> Usuario (Contador);
+
+|Usuario (Contador)|
+if (¿Aprobar o Cancelar?) then (Aprobar)
+  :Confirma aprobación;
+  -> ServicioCompra;
+else (Cancelar)
+  :Confirma cancelación;
+  -> ServicioCompra;
+endif
+
+|ServicioCompra|
+:Actualizar estado de la compra (APROBADA / CANCELADA);
+-> CompraRepository;
+
+|CompraRepository|
+:Actualizar compra en la BD;
+:Confirmar actualización;
+-> ServicioCompra;
+
+|ServicioCompra|
+:Notificar resultado;
+-> Usuario (Contador);
+
+|Usuario (Contador)|
+:Recibe confirmación de aprobación/cancelación;
+stop
+
+@enduml

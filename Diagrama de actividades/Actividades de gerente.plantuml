@@ -1,0 +1,38 @@
+@startuml RecolectarDatos_Gerente
+
+|Usuario (Gerente)|
+start
+:Solicita generar reporte de gestión;
+:Selecciona tipo de datos (Ventas, Compras, Inventario, Contabilidad);
+-> Servicios;
+
+|Servicios|
+if (¿Qué tipo de datos?) then (Ventas)
+  :Llamar a ServicioVenta.obtenerVentas();
+  -> VentaRepository;
+elseif (Compras)
+  :Llamar a ServicioCompra.obtenerCompras();
+  -> CompraRepository;
+elseif (Inventario)
+  :Llamar a ServicioInventario.obtenerProductos();
+  -> ProductoRepository;
+else (Contabilidad)
+  :Llamar a ServicioCompra.obtenerComprasPorEstado(APROBADA, CANCELADA);
+  -> CompraRepository;
+endif
+
+|Repositorios|
+:Conectar a la BD;
+:Ejecutar consulta;
+:Retornar lista de datos;
+-> Servicios;
+|Servicios|
+:Armar reporte consolidado;
+-> Usuario (Gerente);
+
+|Usuario (Gerente)|
+:Recibe reporte final;
+:Analiza información para toma de decisiones;
+stop
+
+@enduml

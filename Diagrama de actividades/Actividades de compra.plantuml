@@ -1,0 +1,34 @@
+@startuml RegistrarCompra
+
+|Usuario (Empleado de Compras)|
+start
+:Solicita registrar compra;
+:Ingresa Proveedor, Productos, Cantidades y Total;
+-> ServicioCompra;
+
+|ServicioCompra|
+:Validar datos de la compra;
+if (¿Datos válidos?) then (Sí)
+  :Crear objeto Compra con estado = PENDIENTE;
+  :Invocar compraRepo.guardar(compra);
+  -> CompraRepository;
+else (No)
+  :Notificar error al empleado;
+  stop
+endif
+
+|CompraRepository|
+:Conectar a la base de datos;
+:Insertar registro de la compra;
+:Confirmar inserción;
+-> ServicioCompra;
+
+|ServicioCompra|
+:Notificar éxito;
+-> Usuario (Empleado Compras);
+
+|Usuario (Empleado de Compras)|
+:Recibe confirmación de compra registrada;
+stop
+
+@enduml

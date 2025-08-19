@@ -1,0 +1,34 @@
+@startuml RegistrarVenta
+
+|Usuario (Vendedor)|
+start
+:Solicita registrar venta;
+:Ingresa datos de Cliente, Productos y Total;
+-> ServicioVenta;
+
+|ServicioVenta|
+:Validar datos de la venta;
+if (¿Datos válidos?) then (Sí)
+  :Crear objeto Venta;
+  :Invocar ventaRepo.guardar(venta);
+  -> VentaRepository;
+else (No)
+  :Notificar error al vendedor;
+  stop
+endif
+
+|VentaRepository|
+:Conectar a la base de datos;
+:Insertar registro de la venta;
+:Confirmar inserción;
+-> ServicioVenta;
+
+|ServicioVenta|
+:Notificar éxito;
+-> Usuario (Vendedor);
+
+|Usuario (Vendedor)|
+:Recibe confirmación de venta registrada;
+stop
+
+@enduml
