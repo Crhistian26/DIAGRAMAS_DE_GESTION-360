@@ -1,0 +1,71 @@
+@startuml map
+title Diagrama de tarjetas CRC - Gestión360
+
+map Cliente #LightSkyBlue {
+  Responsabilidades => Colaboradores
+   Almacenar datos personales \nObtener nombre completo\nRegistrar, actualizar, eliminar cliente\nBuscar por nombre/apellido  => Venta
+}
+
+map Empleado #LightSkyBlue {
+  Responsabilidades => Colaboradores
+  Almacenar datos personales y cargo\nObtener nombre completo\nRegistrar, actualizar, eliminar empleado\nBuscar por nombre/cargo => Usuario\nVenta\nCompra"
+}
+
+map Rol #LightCoral {
+  Responsabilidades => Colaboradores
+  Definir permisos => Usuario\nEmpleado
+}
+
+map Usuario #LightSkyBlue {
+  Responsabilidades => Colaboradores
+  Almacenar credenciales\nAsociar empleado y rol\nAutenticación de usuario\nCambio de contraseña => Empleado\nRol
+}
+
+map Categoria #LightCoral {
+  Responsabilidades => Colaboradores
+  Clasificar productos => Producto
+}
+
+map Producto #LightGreen {
+  Responsabilidades => Colaboradores
+  Almacenar información de produc\nRegistrar, actualizar, eliminar producto\nFiltrarlos para ver los datos\nActualizar stock => Categoría\nProveedor\nVenta\nCompra
+}
+
+map Proveedor #LightSkyBlue {
+  Responsabilidades => Colaboradores
+  Almacenar información del proveedor\nEntregar/Reponer stock de productos => Producto\nCompra
+}
+
+map Venta #LightGreen {
+  Responsabilidades => Colaboradores
+  Registrar los datos correspondientes\nCalcular total\nModificar sus datos\nConsultar ventas => Cliente\nProducto\nEmpleado
+}
+
+map Compra #LightGreen {
+  Responsabilidades => Colaboradores
+  Registrar los datos correspondientes\nCalcular total\nModificar sus datos\nConsultar compras => Empleado\nProveedor\nProducto
+}
+
+
+Cliente <--> Venta
+
+Empleado <--> Venta
+
+Empleado <--> Compra
+
+Usuario <--> Empleado
+
+Usuario <--> Rol
+
+Producto <--> Venta
+
+Producto <-->Categoria
+
+Producto <--> Compra
+
+Proveedor <--> Producto
+
+Proveedor <--> Compra
+
+
+@enduml

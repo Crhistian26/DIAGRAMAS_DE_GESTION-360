@@ -1,0 +1,117 @@
+@startuml
+title Ejemplo de Venta y Compra, con diagrama de objetos - Gestión360
+
+object Cliente #LightCoral {
+    Id = 1
+    Nombre = Ana
+    Apellido = Gómez
+}
+
+object Empleado1 #LightBlue{
+    Id = 1
+    Nombre = Luis
+    Apellido = Martínez
+    Edad = 25
+    Cargo = Vendedor
+}
+
+object Empleado2 #LightBlue{
+    Id = 2
+    Nombre = María
+    Apellido = López
+    Edad = 23
+    Cargo = Compras
+}
+
+object Empleado3 #LightBlue{
+    Id = 3
+    Nombre = Juan
+    Apellido = Perez
+    Edad = 27
+    Cargo = Contable
+}
+
+object Rol #LightGray{
+    Id = 1
+    Rol = "Empleado"
+}
+
+object Usuario1 #LightCyan{
+    Id = 1
+    NombreUsuario = lmartinez
+    Contraseña = ****
+    Empleado = 1
+    Rol = 1
+}
+
+object Usuario2 #LightCyan {
+    Id = 2
+    NombreUsuario = Mlopez
+    Contraseña = ****
+    Empleado = 2
+    Rol = 1
+}
+
+object Usuario3 #LightCyan {
+    Id = 3
+    NombreUsuario = JPerez
+    Contraseña = ****
+    Empleado = 3
+    Rol = 1
+}
+
+object Producto #LightYellow{
+    Id = 1
+    Nombre = Impresora HP
+    Precio = 5000
+    Stock = 20
+    Venta = true
+    Codigo = "P001"
+}
+
+object Proveedor #LightBlue{
+    Id = 1
+    Nombre = "TechSupplier SRL"
+    Direccion = "Av. Duarte #123"
+    Telefono = "809-555-1234"
+    Productos = List<Producto>(1)
+}
+
+object Venta #LightGreen{
+    Id = 1
+    Codigo = "V001"
+    Cliente = 1
+    Vendedor = 1
+    Productos = map<Producto,int>(1, 1)
+    Fecha = "2025-08-19"
+    Total = 5000
+}
+
+object Compra #LightGreen{
+    Id = 1
+    Codigo = "C001"
+    Producto = map<Producto,int>(1, 2)
+    Empleado = 2;
+    Proveedor = 1;
+    Fecha = 2025-08-15
+    Total = 7500
+    Estado = Aprobada
+}
+
+
+Cliente --> Venta : realiza
+Empleado1 --> Venta : atiende
+Venta --> Producto : incluye
+Usuario1 --> Empleado1 : pertenece
+Usuario1 --> Rol: tiene
+
+Usuario2 --> Empleado2 : pertenece
+Usuario2 --> Rol : tiene
+Empleado2 --> Compra : gestiona
+Compra --> Proveedor : realizada a
+Compra --> Producto : abastece
+
+Usuario3 --> Empleado3 : petenerce
+Usuario3 --> Rol : tiene
+Empleado3 --> Compra : Aprueba
+@enduml
